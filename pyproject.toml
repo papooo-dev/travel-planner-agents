@@ -1,0 +1,16 @@
+[project]
+name = "travel-planning-agents"
+version = "0.1.0"
+description = "여행 계획을 세워주는 AI 에이전트 어플리케이션입니다."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi[standard]>=0.115.12",
+    "googlemaps>=4.10.0",
+    "langchain-community>=0.3.24",
+    "langchain-tavily>=0.1.6",
+    "langchain[openai]>=0.3.25",
+    "langgraph>=0.4.5",
+    "langgraph-supervisor>=0.0.25",
+    "streamlit>=1.45.1",
+]
