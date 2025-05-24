@@ -17,28 +17,39 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 def sse_format(data: str) -> str:
     """SSE 프로토콜에 맞춰 data 라인 구성"""
     return f"data: {data}\n\n"
 
-async def agent_stream(query: str, session_id: str):
+
+async def agent_stream(query: str, thread_id: str):
     """LangGraph agent의 .stream() 결과를 SSE로 변환해 Yield"""
-    async for token, metadata in supervisor_agent.astream(
+    async for evt in supervisor_agent.astream_events(
+        # async for chunk in supervisor_agent.astream(
         {"messages": [{"role": "user", "content": query}]},
-        config={"configurable": {"thread_id": session_id}},
+        config={"configurable": {"thread_id": thread_id}},
         stream_mode="messages",
+        version="v2",
     ):
-        msg = token.content
-        if msg:
-            yield sse_format(msg)
+        if evt["event"] == "on_chat_model_stream":
+            chunk = evt["data"]["chunk"]  # ChatMessage
+            if chunk.content:
+                if evt["tags"] in ["place_search_agent", "place_search_agent"]:
+                    # 다른 agent 응답
+                    yield sse_format(chunk.content)
+                else:
+                    # supervisor agent 응답
+                    yield sse_format(chunk.content)
+
 
 
 @app.post("/chat")
 async def agent_chat(body: dict):
     query: str = body.get("query", "")
-    session_id: str = body.get("session_id", "")
+    thread_id: str = body.get("thread_id", "")
 
     return StreamingResponse(
-        agent_stream(query, session_id),
+        agent_stream(query, thread_id),
         media_type="text/event-stream",
     )
