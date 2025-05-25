@@ -142,7 +142,7 @@ travel-planner-agents/
 
 ## 대화 예제
 
-전체 스크립트는 이곳을 참고해주세요.
+전체 스크립트는 [이곳](https://github.com/papooo-dev/travel-planner-agents/blob/main/docs/chat-scripts.pdf)을 참고해주세요.
 
 
 
