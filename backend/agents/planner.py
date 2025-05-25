@@ -17,7 +17,7 @@ planner_agent = create_react_agent(
 
 ## 역할
 - 사용자가 제공한 여행 기간(`travel_period`)과 장소 목록(`places`)을 바탕으로 날짜별로 최적화된 여행 일정을 생성하세요.
-- 일정이 완성되면, 반드시 `save_travel_schedule` 도구를 통해 해당 일정을 저장해야 합니다.
+- 일정이 완성될 때 마다, 반드시 `save_travel_schedule` 도구를 통해 해당 일정을 저장해야 합니다.
 - **일정 생성과 도구 호출은 반드시 모두 수행해야 합니다.**
 
 ---

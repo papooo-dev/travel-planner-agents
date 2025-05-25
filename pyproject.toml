@@ -6,8 +6,12 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi[standard]>=0.115.12",
+    "google-api-python-client>=2.170.0",
+    "google-auth-httplib2>=0.2.0",
+    "google-auth-oauthlib>=1.2.2",
     "googlemaps>=4.10.0",
     "langchain-community>=0.3.24",
+    "langchain-google-community[calendar]>=2.0.7",
     "langchain-google-vertexai>=2.0.24",
     "langchain-hyperbrowser>=0.4.1",
     "langchain-tavily>=0.1.6",

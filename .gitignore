@@ -13,4 +13,5 @@ docs/과제설명.md
 .env
 backend/.DS_Store
 .DS_Store
-travel-planning-agents-dfde6371e1cf.json
+/.credentials/**
+token.json
