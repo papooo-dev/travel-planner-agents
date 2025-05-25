@@ -32,6 +32,7 @@ async def agent_stream(query: str, thread_id: str):
             config={"configurable": {"thread_id": thread_id}},
             stream_mode="messages",
             version="v2",
+            
         ):
             if evt["event"] == "on_chat_model_stream":
                 chunk = evt["data"]["chunk"]  # ChatMessage
