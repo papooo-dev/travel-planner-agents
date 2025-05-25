@@ -1,8 +1,9 @@
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.agents.supervisor import supervisor_agent
 from fastapi.responses import StreamingResponse
 from dotenv import load_dotenv
+import json
 
 load_dotenv()
 
@@ -20,28 +21,29 @@ app.add_middleware(
 
 def sse_format(data: str) -> str:
     """SSE 프로토콜에 맞춰 data 라인 구성"""
-    return f"data: {data}\n\n"
+    return f"data: {json.dumps(data, ensure_ascii=False)}\n\n"
 
 
 async def agent_stream(query: str, thread_id: str):
     """LangGraph agent의 .stream() 결과를 SSE로 변환해 Yield"""
-    async for evt in supervisor_agent.astream_events(
-        # async for chunk in supervisor_agent.astream(
-        {"messages": [{"role": "user", "content": query}]},
-        config={"configurable": {"thread_id": thread_id}},
-        stream_mode="messages",
-        version="v2",
-    ):
-        if evt["event"] == "on_chat_model_stream":
-            chunk = evt["data"]["chunk"]  # ChatMessage
-            if chunk.content:
-                if evt["tags"] in ["place_search_agent", "place_search_agent"]:
-                    # 다른 agent 응답
+    try:
+        async for evt in supervisor_agent.astream_events(
+            {"messages": [{"role": "user", "content": query}]},
+            config={"configurable": {"thread_id": thread_id}},
+            stream_mode="messages",
+            version="v2",
+        ):
+            if evt["event"] == "on_chat_model_stream":
+                chunk = evt["data"]["chunk"]  # ChatMessage
+                if chunk.content != "" and len(evt['tags']) == 1:
                     yield sse_format(chunk.content)
-                else:
-                    # supervisor agent 응답
-                    yield sse_format(chunk.content)
-
+    except Exception as e:
+        # 오류 발생 시 클라이언트에게 오류 정보 전달
+        error_data = {
+            "agent_type": "error",
+            "content": f"오류가 발생했습니다: {str(e)}"
+        }
+        yield sse_format(json.dumps(error_data, ensure_ascii=False))
 
 
 @app.post("/chat")
